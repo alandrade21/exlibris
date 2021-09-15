@@ -1,26 +1,24 @@
 {
-  "name": "@alandrade21/exlibris-alandrade21",
-  "version": "0.0.4",
-  "description": "Angular 11 with Electron (Typescript + SASS + Hot Reload) and sqlite and typeorm",
-  "homepage": "https://github.com/alandrade21/exlibris-boilerplate",
+  "name": "@alandrade21/exlibris",
+  "version": "0.0.1",
+  "description": "Ebook library manager",
+  "homepage": "https://github.com/alandrade21/exlibris",
   "license": "AGPL-3.0",
   "author": "André Andrade <alandrade21@gmail.com> (https://github.com/alandrade21)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/alandrade21/exlibris-boilerplate.git"
+    "url": "https://github.com/alandrade21/exlibris.git"
   },
   "keywords": [
+    "ebook library",
+    "ebook catalog",
     "angular",
     "angular 11",
     "electron",
     "nodejs",
     "typescript",
-    "eslint",
-    "spectron",
-    "sass",
     "sqlite",
-    "typeorm",
-    "boilerplate"
+    "typeorm"
   ],
   "main": "dist/electron-out-tsc/main.js",
   "private": true,
