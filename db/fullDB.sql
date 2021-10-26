@@ -31,6 +31,37 @@ CREATE TABLE tb_tag (
   color TEXT -- color hex code
 );
 
+/*
+ * Table Publisher
+ *
+ * List of publisers.
+ */
+CREATE TABLE tb_publisher (
+  id INTEGER not null PRIMARY KEY autoincrement,
+  name TEXT not null UNIQUE
+);
+
+/*
+ * Table Language
+ *
+ * List of idioms.
+ */
+CREATE TABLE tb_language (
+  id INTEGER not null PRIMARY KEY autoincrement,
+  name TEXT not null UNIQUE
+);
+
+/*
+ * Table File Types
+ *
+ * List of file types and its icons.
+ */
+CREATE TABLE tb_file_types (
+  id INTEGER not null PRIMARY KEY autoincrement,
+  name TEXT not null UNIQUE,
+  icon_path TEXT
+);
+
 /*************************************************/
 
 /* Author Tables */
@@ -38,7 +69,7 @@ CREATE TABLE tb_tag (
 /*
  * Table Author
  *
- * Bio data of leterary work creators.
+ * Bio data of literary work creators.
  */
 CREATE TABLE tb_author (
   id INTEGER not null PRIMARY KEY autoincrement,
@@ -57,7 +88,8 @@ CREATE TABLE tb_author (
 CREATE TABLE tb_author_media (
   author_fk INTEGER not null REFERENCES tb_author(id),
   media_fk INTEGER not null REFERENCES tb_media(id),
-  PRIMARY KEY (author_fk, media_fk)
+  link TEXT not null,
+  PRIMARY KEY (author_fk, media_fk, link)
 ) WITHOUT ROWID;
 
 /*
@@ -81,8 +113,58 @@ CREATE TABLE tb_author_tag (
 CREATE TABLE tb_title (
   id INTEGER not null PRIMARY KEY autoincrement,
   title TEXT not null,
-  author_fk INTEGER REFERENCES tb_author(id),
+  sort_title TEXT not null,
+  original_titla TEXT,
+  original_publication_year TEXT
 );
+
+/*
+ * Weak entity to relate the author and his/hers books.
+ */
+CREATE TABLE tb_title_author (
+  title_fk INTEGER not null REFERENCES tb_title(id),
+  author_fk INTEGER not null REFERENCES tb_author(id),
+  role TEXT,
+  PRIMARY KEY (title_fk, author_fk)
+) WITHOUT ROWID;
+
+/*
+ * Table Edition
+ *
+ * Collection os editions from a title.
+ */
+CREATE TABLE tb_edition (
+  id INTEGER not null PRIMARY KEY autoincrement,
+  title_fk INTEGER not null REFERENCES tb_title(id),
+  title TEXT not null,
+  sort_title TEXT not null,
+  edition TEXT,
+  isbn TEXT,
+  publisher_fk INTEGER REFERENCES tb_publisher(id),
+  publication_year TEXT,
+  pages INTEGER CHECK (pages >= 0),
+  oficial_url TEXT,
+  description TEXT,
+  language_fk INTEGER REFERENCES tb_language(id),
+  creation_date TEXT not null DEFAULT (date('now')),
+  last_alteration_date TEXT DEFAULT (date('now'))
+);
+
+/*
+ * Table e-book
+ *
+ * Represents an edition e-book file.
+ */
+CREATE TABLE tb_ebook (
+  id INTEGER not null PRIMARY KEY autoincrement,
+  path TEXT not null,
+  file_name TEXT not null,
+  format TEXT not null,
+  edition_fk INTEGER not null REFERENCES tb_edition(id),
+  UNIQUE (edition_fk, format)
+)
+
+/*******************************************************/
 
 /* Picture Hierarchy */
 
@@ -93,14 +175,15 @@ CREATE TABLE tb_title (
  */
 CREATE TABLE tb_picture (
   id INTEGER not null PRIMARY KEY autoincrement,
-  picture_path TEXT not null,
-  type TEXT not null CHECK (type in ('AUTHOR', 'MEDIA')) -- selector field
+  path TEXT not null,
+  type TEXT not null CHECK (type in ('AUTHOR', 'MEDIA', 'COVER')) -- selector field
 );
 
 /*
  * Table Author Picture
  *
  * Child entity for all author pictures.
+ * Type = 'AUTHOR'
  */
 CREATE TABLE tb_author_picture (
   id INTEGER not null PRIMARY KEY REFERENCES tb_picture(id),
@@ -111,10 +194,22 @@ CREATE TABLE tb_author_picture (
  * Table Media Icon
  *
  * Child entity for all media icon pictures.
+ * Type = 'MEDIA'
  */
 CREATE TABLE tb_media_icon (
   id INTEGER not null PRIMARY KEY REFERENCES tb_picture(id),
   media_fk INTEGER not null REFERENCES tb_media(id)
+) WITHOUT ROWID;
+
+/*
+ * Table Edition Cover
+ *
+ * Child entity for all editions cover.
+ * Type = 'COVER'
+ */
+CREATE TABLE tb_edition_cover (
+  id INTEGER not null PRIMARY KEY REFERENCES tb_picture(id),
+  edition_fk INTEGER not null REFERENCES tb_edition(id)
 ) WITHOUT ROWID;
 
 /********************************************************/
